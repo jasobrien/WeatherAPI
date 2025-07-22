@@ -6,22 +6,20 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.7" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageReference Include="Reqnroll" Version="2.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />    <PackageReference Include="Reqnroll" Version="2.4.1" />
     <PackageReference Include="Reqnroll.xUnit" Version="2.4.1" />
+    <PackageReference Include="ReportGenerator" Version="5.3.8" />
+    <PackageReference Include="Testcontainers" Version="3.10.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
+  </ItemGroup>  <ItemGroup>
     <ProjectReference Include="..\..\src\WeatherAPI\WeatherAPI.csproj" />
   </ItemGroup>
 

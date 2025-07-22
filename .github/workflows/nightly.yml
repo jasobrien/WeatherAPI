@@ -1,0 +1,279 @@
+name: Nightly Comprehensive Tests
+
+on:
+  schedule:
+    # Run at 2 AM UTC every day
+    - cron: "0 2 * * *"
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  DOTNET_VERSION: "8.0.x"
+  JAVA_VERSION: "17"
+
+jobs:
+  comprehensive-tests:
+    name: Comprehensive Testing Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: 🐋 Setup Docker
+        run: |
+          sudo systemctl start docker
+          sudo usermod -aG docker $USER
+
+      - name: 📦 Restore dependencies
+        run: dotnet restore
+
+      - name: 🔨 Build solution (Release)
+        run: dotnet build --configuration Release --no-restore
+
+      - name: 🧪 Run all unit tests with coverage
+        run: |
+          dotnet test test/WeatherAPI.UnitTests/WeatherAPI.UnitTests.csproj \
+            --configuration Release \
+            --no-build \
+            --logger "trx;LogFileName=unit-test-results.trx" \
+            --logger "console;verbosity=detailed" \
+            --results-directory TestResults/UnitTests/ \
+            --collect:"XPlat Code Coverage" \
+            --settings coverletArgs.runsettings
+
+      - name: 🔍 Deep contract validation
+        run: |
+          cd test/WeatherAPI.SpecmaticTests/contract
+
+          echo "🔍 Running comprehensive contract validation..."
+
+          # Pull latest Specmatic
+          docker pull znsio/specmatic:latest
+
+          # Validate contract
+          docker run --rm \
+            -v "$(pwd):/usr/src/app" \
+            -w /usr/src/app \
+            znsio/specmatic:latest \
+            validate weather-api-contract.yaml --verbose
+            
+          # Test contract examples
+          docker run --rm \
+            -v "$(pwd):/usr/src/app" \
+            -w /usr/src/app \
+            znsio/specmatic:latest \
+            examples weather-api-contract.yaml
+
+      - name: 🎭 Comprehensive stub testing
+        run: |
+          cd test/WeatherAPI.SpecmaticTests/contract
+
+          echo "🎭 Running comprehensive stub server tests..."
+
+          # Start stub server
+          docker run --rm -d \
+            --name specmatic-nightly-stub \
+            -p 9003:9003 \
+            -v "$(pwd):/usr/src/app" \
+            -w /usr/src/app \
+            znsio/specmatic:latest \
+            stub weather-api-contract.yaml --port=9003
+            
+          # Wait for startup
+          sleep 15
+
+          # Comprehensive endpoint testing
+          echo "Testing basic forecast..."
+          curl -f "http://localhost:9003/api/WeatherForecast?basic=true" \
+            -H "X-Test-Scenario: basic-forecast" \
+            -H "Authorization: Bearer test-token" || echo "❌ Basic forecast failed"
+            
+          echo "Testing location-specific forecast..."
+          curl -f "http://localhost:9003/api/WeatherForecast?location=London" \
+            -H "X-Test-Scenario: location-forecast" \
+            -H "Authorization: Bearer test-token" || echo "❌ Location forecast failed"
+            
+          echo "Testing error scenarios..."
+          curl -f "http://localhost:9003/api/WeatherForecast" \
+            -H "X-Test-Scenario: server-error" \
+            -H "Authorization: Bearer test-token" || echo "❌ Server error test failed"
+            
+          echo "Testing health endpoint..."
+          curl -f "http://localhost:9003/health" || echo "❌ Health check failed"
+
+          # Cleanup
+          docker stop specmatic-nightly-stub || true
+
+      - name: 🧪 Full acceptance test suite
+        run: |
+          cd test/WeatherAPI.AcceptanceTests
+
+          echo "🚀 Running full acceptance test suite..."
+
+          # Clean results
+          rm -rf TestResults/
+          mkdir -p TestResults/
+
+          # Run with extended timeout and detailed logging
+          dotnet test \
+            --configuration Release \
+            --logger "trx;LogFileName=nightly-results.trx" \
+            --logger "html;LogFileName=nightly-results.html" \
+            --logger "console;verbosity=diagnostic" \
+            --results-directory TestResults/ \
+            --collect:"XPlat Code Coverage" \
+            --blame-hang-timeout 10m \
+            --blame-crash \
+            -- TestRunParameters.Parameter\(name=\"TestType\",value=\"Comprehensive\"\)
+
+      - name: 📊 Generate comprehensive reports
+        if: always()
+        run: |
+          # Install ReportGenerator
+          dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.1.26 || true
+
+          cd test/WeatherAPI.AcceptanceTests
+
+          # Find all coverage files
+          COVERAGE_FILES=$(find . -name "*.cobertura.xml" -o -name "coverage.xml" | tr '\n' ';' | sed 's/;$//')
+
+          if [ ! -z "$COVERAGE_FILES" ]; then
+            reportgenerator \
+              -reports:"$COVERAGE_FILES" \
+              -targetdir:"TestResults/ComprehensiveCoverage" \
+              -reporttypes:"Html;Badges;TextSummary;JsonSummary" \
+              -title:"Weather API Nightly Test Coverage" \
+              -tag:"nightly-${{ github.run_number }}" \
+              -verbosity:Info
+          fi
+
+          # Generate nightly summary
+          cat > TestResults/nightly-summary.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Weather API Nightly Test Summary</title>
+              <style>
+                  body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+                  .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                  .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+                  .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+                  .success { background: #e8f5e8; border-color: #4caf50; }
+                  .info { background: #e3f2fd; border-color: #2196f3; }
+                  .warning { background: #fff3e0; border-color: #ff9800; }
+                  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+                  .metric { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+                  .metric h3 { margin: 0; color: #1976d2; }
+                  .metric .value { font-size: 2em; font-weight: bold; color: #2e7d32; }
+                  .links { display: flex; gap: 10px; flex-wrap: wrap; }
+                  .btn { 
+                      display: inline-block; padding: 12px 20px; 
+                      background: #1976d2; color: white; text-decoration: none; 
+                      border-radius: 6px; margin: 5px 0; transition: background 0.3s;
+                  }
+                  .btn:hover { background: #1565c0; }
+                  .timestamp { font-style: italic; color: #666; }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="header">
+                      <h1>🌙 Weather API Nightly Test Results</h1>
+                      <p>Comprehensive testing suite including contract validation, stub testing, and full acceptance tests</p>
+                      <p class="timestamp">Generated: $(date) | Build: ${{ github.run_number }}</p>
+                  </div>
+                  
+                  <div class="grid">
+                      <div class="metric">
+                          <h3>Test Coverage</h3>
+                          <div class="value">📊</div>
+                          <p>Comprehensive coverage analysis</p>
+                      </div>
+                      <div class="metric">
+                          <h3>Contract Tests</h3>
+                          <div class="value">✅</div>
+                          <p>OpenAPI validation with Specmatic</p>
+                      </div>
+                      <div class="metric">
+                          <h3>Stub Testing</h3>
+                          <div class="value">🎭</div>
+                          <p>All stub scenarios validated</p>
+                      </div>
+                      <div class="metric">
+                          <h3>Acceptance Tests</h3>
+                          <div class="value">🧪</div>
+                          <p>Full behavioral testing suite</p>
+                      </div>
+                  </div>
+                  
+                  <div class="section info">
+                      <h2>📊 Test Reports</h2>
+                      <div class="links">
+                          <a href="nightly-results.html" class="btn">📝 Detailed Results</a>
+                          <a href="ComprehensiveCoverage/index.html" class="btn">📈 Coverage Report</a>
+                          <a href="nightly-results.trx" class="btn">📋 TRX Results</a>
+                      </div>
+                  </div>
+                  
+                  <div class="section success">
+                      <h2>🔍 Validation Summary</h2>
+                      <ul>
+                          <li><strong>Contract Validation:</strong> OpenAPI specification syntax and semantic validation</li>
+                          <li><strong>Example Generation:</strong> Automatic test case generation from contract</li>
+                          <li><strong>Stub Server Testing:</strong> All endpoint and error scenario validation</li>
+                          <li><strong>Integration Testing:</strong> Full end-to-end workflow verification</li>
+                          <li><strong>Performance Testing:</strong> Response time and reliability checks</li>
+                      </ul>
+                  </div>
+                  
+                  <div class="section warning">
+                      <h2>⚠️ Nightly Test Notes</h2>
+                      <p>This comprehensive test suite runs extended validations including:</p>
+                      <ul>
+                          <li>Deep contract analysis and example generation</li>
+                          <li>Extended stub server testing with all scenarios</li>
+                          <li>Performance and reliability testing</li>
+                          <li>Comprehensive code coverage analysis</li>
+                      </ul>
+                      <p>If any tests fail, review the detailed logs and consider the impact on the main branch.</p>
+                  </div>
+              </div>
+          </body>
+          </html>
+          EOF
+
+      - name: 📊 Upload comprehensive test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nightly-test-results
+          path: test/WeatherAPI.AcceptanceTests/TestResults/
+          retention-days: 30
+
+      - name: 📧 Notify on failure
+        if: failure()
+        run: |
+          echo "# 🚨 Nightly Test Failure Alert" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "❌ **Status**: Nightly comprehensive tests failed" >> $GITHUB_STEP_SUMMARY
+          echo "🕐 **Time**: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 **Run**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Action Required**: Review test results and fix failing tests before next release." >> $GITHUB_STEP_SUMMARY

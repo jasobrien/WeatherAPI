@@ -1,0 +1,186 @@
+{
+  "http-request": {
+    "method": "GET",
+    "path": "/api/WeatherForecast",
+    "headers": {},
+    "queryParameters": {
+      "location": "London"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": [
+      {
+        "hour": 1,
+        "temperatureC": 8,
+        "temperatureF": 46,
+        "rainfallMm": 2.1,
+        "location": "London"
+      },
+      {
+        "hour": 2,
+        "temperatureC": 7,
+        "temperatureF": 45,
+        "rainfallMm": 1.8,
+        "location": "London"
+      },
+      {
+        "hour": 3,
+        "temperatureC": 9,
+        "temperatureF": 48,
+        "rainfallMm": 3.2,
+        "location": "London"
+      },
+      {
+        "hour": 4,
+        "temperatureC": 11,
+        "temperatureF": 52,
+        "rainfallMm": 2.5,
+        "location": "London"
+      },
+      {
+        "hour": 5,
+        "temperatureC": 13,
+        "temperatureF": 55,
+        "rainfallMm": 1.9,
+        "location": "London"
+      },
+      {
+        "hour": 6,
+        "temperatureC": 15,
+        "temperatureF": 59,
+        "rainfallMm": 0.8,
+        "location": "London"
+      },
+      {
+        "hour": 7,
+        "temperatureC": 17,
+        "temperatureF": 63,
+        "rainfallMm": 0.2,
+        "location": "London"
+      },
+      {
+        "hour": 8,
+        "temperatureC": 19,
+        "temperatureF": 66,
+        "rainfallMm": 0.0,
+        "location": "London"
+      },
+      {
+        "hour": 9,
+        "temperatureC": 21,
+        "temperatureF": 70,
+        "rainfallMm": 0.1,
+        "location": "London"
+      },
+      {
+        "hour": 10,
+        "temperatureC": 23,
+        "temperatureF": 73,
+        "rainfallMm": 0.3,
+        "location": "London"
+      },
+      {
+        "hour": 11,
+        "temperatureC": 24,
+        "temperatureF": 75,
+        "rainfallMm": 0.7,
+        "location": "London"
+      },
+      {
+        "hour": 12,
+        "temperatureC": 25,
+        "temperatureF": 77,
+        "rainfallMm": 1.2,
+        "location": "London"
+      },
+      {
+        "hour": 13,
+        "temperatureC": 26,
+        "temperatureF": 79,
+        "rainfallMm": 1.8,
+        "location": "London"
+      },
+      {
+        "hour": 14,
+        "temperatureC": 25,
+        "temperatureF": 77,
+        "rainfallMm": 2.4,
+        "location": "London"
+      },
+      {
+        "hour": 15,
+        "temperatureC": 23,
+        "temperatureF": 73,
+        "rainfallMm": 3.1,
+        "location": "London"
+      },
+      {
+        "hour": 16,
+        "temperatureC": 21,
+        "temperatureF": 70,
+        "rainfallMm": 2.8,
+        "location": "London"
+      },
+      {
+        "hour": 17,
+        "temperatureC": 19,
+        "temperatureF": 66,
+        "rainfallMm": 2.2,
+        "location": "London"
+      },
+      {
+        "hour": 18,
+        "temperatureC": 17,
+        "temperatureF": 63,
+        "rainfallMm": 1.9,
+        "location": "London"
+      },
+      {
+        "hour": 19,
+        "temperatureC": 15,
+        "temperatureF": 59,
+        "rainfallMm": 1.5,
+        "location": "London"
+      },
+      {
+        "hour": 20,
+        "temperatureC": 13,
+        "temperatureF": 55,
+        "rainfallMm": 1.1,
+        "location": "London"
+      },
+      {
+        "hour": 21,
+        "temperatureC": 11,
+        "temperatureF": 52,
+        "rainfallMm": 0.8,
+        "location": "London"
+      },
+      {
+        "hour": 22,
+        "temperatureC": 9,
+        "temperatureF": 48,
+        "rainfallMm": 0.6,
+        "location": "London"
+      },
+      {
+        "hour": 23,
+        "temperatureC": 8,
+        "temperatureF": 46,
+        "rainfallMm": 0.4,
+        "location": "London"
+      },
+      {
+        "hour": 24,
+        "temperatureC": 7,
+        "temperatureF": 45,
+        "rainfallMm": 0.3,
+        "location": "London"
+      }
+    ]
+  }
+}

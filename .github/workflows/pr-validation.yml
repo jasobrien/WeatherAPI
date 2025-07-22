@@ -1,0 +1,66 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+env:
+  DOTNET_VERSION: "8.0.x"
+
+jobs:
+  quick-validation:
+    name: Quick Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 📦 Restore dependencies
+        run: dotnet restore
+
+      - name: 🔨 Build solution
+        run: dotnet build --configuration Debug --no-restore
+
+      - name: 🧪 Run unit tests
+        run: |
+          dotnet test test/WeatherAPI.UnitTests/WeatherAPI.UnitTests.csproj \
+            --configuration Debug \
+            --no-build \
+            --logger "console;verbosity=normal"
+
+      - name: 🔍 Validate contract syntax
+        run: |
+          echo "🔍 Validating OpenAPI contract syntax..."
+          cd test/WeatherAPI.SpecmaticTests/contract
+
+          # Basic YAML syntax validation
+          python3 -c "
+          import yaml
+          import sys
+          try:
+              with open('weather-api-contract.yaml', 'r') as f:
+                  yaml.safe_load(f)
+              print('✅ Contract YAML syntax is valid')
+          except yaml.YAMLError as e:
+              print(f'❌ Contract YAML syntax error: {e}')
+              sys.exit(1)
+          except Exception as e:
+              print(f'❌ Error validating contract: {e}')
+              sys.exit(1)
+          "
+
+      - name: 📊 PR Summary
+        run: |
+          echo "# 🔍 Pull Request Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Build**: Successful" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Unit Tests**: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Contract Syntax**: Valid" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "💡 **Note**: Full contract and acceptance tests will run after merge to main/develop" >> $GITHUB_STEP_SUMMARY

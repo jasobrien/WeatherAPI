@@ -1,0 +1,19 @@
+{
+  "http-request": {
+    "method": "GET",
+    "path": "/health",
+    "headers": {},
+    "queryParameters": {}
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "status": "UP",
+      "timestamp": "2025-07-23T00:00:00Z",
+      "service": "WeatherAPI"
+    }
+  }
+}

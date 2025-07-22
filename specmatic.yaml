@@ -1,0 +1,233 @@
+# Specmatic Configuration for Weather API
+# This configuration file defines how Specmatic handles contract testing, 
+# stub generation, and API validation for the Weather API solution.
+
+# Project Information
+project:
+  name: "WeatherAPI"
+  version: "1.0.0"
+  description: "Weather forecast API with 24-hour predictions and error handling"
+
+# Source Configuration
+sources:
+  - provider: git
+    repository: .
+    consumes:
+      - type: openapi
+        specification: test/WeatherAPI.SpecmaticTests/contract/weather-api-contract.yaml
+        
+# Contract and Stub Configuration
+contracts:
+  - specification: test/WeatherAPI.SpecmaticTests/contract/weather-api-contract.yaml
+    stub:
+      # Enable stub mode with explicit stub data directory
+      enabled: true
+      data: test/WeatherAPI.SpecmaticTests/contract/stubs
+      # Ensure strict stub matching - use stubs over contract generation
+      strict: true
+      # Load all stub files in the directory
+      load-all: true
+      # Disable contract-based example generation when stubs exist
+      disable-examples: true
+    
+    # Test Configuration
+    test:
+      # Use actual API for contract validation tests
+      baseURL: http://localhost:5000
+      # Timeout for API calls during testing
+      timeout: 30
+      # Headers to include in all test requests
+      headers:
+        Content-Type: application/json
+        Accept: application/json
+      
+    # Validation Rules
+    validation:
+      # Validate response structure against contract
+      response-structure: true
+      # Validate response status codes
+      status-codes: true
+      # Validate content-type headers
+      content-type: true
+      # Check for required fields
+      required-fields: true
+
+# Stub Server Configuration  
+stub:
+  # Default port for stub server (can be overridden)
+  port: 9000
+  # Host binding
+  host: "0.0.0.0"
+  # Stub matching strategy
+  matching:
+    # Match requests based on method, path, query parameters, and headers
+    strategy: "exact"
+    # Enable case-sensitive matching for headers and query parameters
+    case-sensitive: false
+    # Timeout for stub responses
+    timeout: 5000
+    
+  # Stub loading configuration
+  loading:
+    # Directory containing stub files
+    directory: test/WeatherAPI.SpecmaticTests/contract/stubs
+    # File pattern for stub files
+    pattern: "*.json"
+    # Reload stubs when files change (for development)
+    watch: true
+    # Strict mode - fail if no matching stub found
+    strict-mode: true
+    
+  # Response Configuration
+  response:
+    # Default response headers
+    headers:
+      Content-Type: application/json
+      X-Powered-By: Specmatic
+    # Default response when no stub matches (if strict-mode is false)
+    default-status: 404
+    
+  # Logging for stub matching debugging
+  logging:
+    # Log level for stub server
+    level: INFO
+    # Log stub matching details
+    stub-matching: true
+    # Log request/response details
+    request-response: true
+
+# Testing Framework Integration
+testing:
+  # Enable contract testing
+  contract-tests: true
+  # Generate tests from OpenAPI examples
+  generate-tests: false  # Disabled since we use custom stubs
+  # Test execution configuration
+  execution:
+    # Parallel test execution
+    parallel: false
+    # Maximum retry attempts for failed tests
+    retries: 3
+    # Test timeout in seconds
+    timeout: 60
+    
+  # Test Data Management
+  data:
+    # Use stub data for tests
+    use-stubs: true
+    # Fallback to contract examples if no stub available
+    fallback-to-examples: false
+    # Generate random data for missing properties
+    generate-missing: false
+
+# Environment-Specific Configuration
+environments:
+  # Local Development Environment
+  local:
+    stub:
+      port: 9000
+      host: "localhost"
+    test:
+      baseURL: http://localhost:5000
+    logging:
+      level: DEBUG
+      
+  # CI/CD Environment  
+  ci:
+    stub:
+      port: 9000
+      host: "0.0.0.0"
+    test:
+      baseURL: http://localhost:5000
+    logging:
+      level: INFO
+      
+  # Docker Environment
+  docker:
+    stub:
+      port: 9000
+      host: "0.0.0.0"
+    test:
+      baseURL: http://weatherapi:5000
+    logging:
+      level: WARN
+
+# Feature Flags
+features:
+  # Enable new stub matching algorithm
+  enhanced-stub-matching: true
+  # Enable query parameter matching
+  query-parameter-matching: true
+  # Enable header-based stub selection
+  header-based-selection: true
+  # Enable strict JSON schema validation
+  strict-json-validation: true
+  # Enable CORS handling
+  cors-handling: true
+
+# Security Configuration
+security:
+  # Enable authentication header validation
+  auth-validation: false
+  # CORS configuration
+  cors:
+    enabled: true
+    allowed-origins: ["*"]
+    allowed-methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allowed-headers: ["Content-Type", "Authorization", "X-Test-Scenario"]
+
+# Performance Configuration
+performance:
+  # Connection pooling
+  connection-pool:
+    max-connections: 10
+    connection-timeout: 5000
+  # Request/Response limits
+  limits:
+    max-request-size: "10MB"
+    max-response-size: "10MB"
+    max-response-time: 30000
+    
+# Reporting Configuration
+reporting:
+  # Enable detailed test reports
+  enabled: true
+  # Output format for reports
+  format: ["json", "html"]
+  # Report output directory
+  output-dir: "test-reports"
+  # Include request/response details in reports
+  include-details: true
+  # Generate coverage reports
+  coverage: true
+
+# Integration Configuration
+integrations:
+  # CI/CD Integration
+  ci:
+    # GitHub Actions integration
+    github-actions: true
+    # Generate JUnit XML reports
+    junit-reports: true
+    
+  # Docker Integration
+  docker:
+    # Enable Docker container support
+    enabled: true
+    # Default image for Specmatic
+    image: "specmatic/specmatic:latest"
+    # Container configuration
+    container:
+      memory: "512m"
+      cpu: "0.5"
+
+# Development Configuration
+development:
+  # Enable hot reload for contract changes
+  hot-reload: true
+  # Enable debug mode
+  debug: true
+  # Verbose logging
+  verbose: true
+  # Enable request/response logging
+  log-requests: true

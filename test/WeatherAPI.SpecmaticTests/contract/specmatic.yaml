@@ -1,0 +1,95 @@
+# Specmatic Test Configuration
+# This file is specifically for the test project and focuses on fixing stub matching issues
+
+# Specification source
+specification: weather-api-contract.yaml
+
+# Stub configuration for the test environment
+stub:
+  # Explicit stub data directory
+  data: ./stubs
+  # Force strict stub matching - use stubs over contract generation
+  strict: true
+  # Disable automatic example generation from contract
+  disable-examples: true
+  # Load all stub files on startup
+  preload: true
+  
+# Request matching configuration
+matching:
+  # Match requests exactly including query parameters and headers
+  method: exact
+  path: exact
+  query: exact
+  headers: partial  # Allow additional headers not specified in stub
+  
+# Stub priority order (highest to lowest priority)
+priority:
+  - query-parameters    # Match by query parameters first
+  - headers            # Then by headers
+  - path               # Then by path
+  - method             # Finally by method
+
+# Specific stub routing rules
+routes:
+  - path: "/api/WeatherForecast"
+    method: "GET"
+    stubs:
+      # Basic weather forecast (default)
+      - file: "weather-forecast-basic.json"
+        conditions:
+          query:
+            basic: "true"
+      # London-specific forecast  
+      - file: "weather-forecast-london.json"
+        conditions:
+          query:
+            location: "London"
+      # Service unavailable error
+      - file: "weather-service-unavailable.json"
+        conditions:
+          headers:
+            X-Test-Scenario: "service-unavailable"
+      # Unauthorized error
+      - file: "weather-unauthorized.json"
+        conditions:
+          headers:
+            X-Test-Scenario: "unauthorized"
+      # Bad request error
+      - file: "weather-bad-request.json"
+        conditions:
+          query:
+            invalid: "true"
+            
+  # Health check endpoint
+  - path: "/health"
+    method: "GET"
+    stubs:
+      - file: "health-check.json"
+        
+  # Invalid endpoints
+  - path: "/api/InvalidEndpoint"
+    method: "GET"
+    stubs:
+      - file: "invalid-endpoint-404.json"
+
+# Fallback behavior when no stub matches
+fallback:
+  # Don't generate from contract - return 404 instead
+  generate-from-contract: false
+  # Default response for unmatched requests
+  default-response:
+    status: 404
+    headers:
+      Content-Type: "application/json"
+    body:
+      error: "Not Found"
+      message: "No matching stub found for this request"
+
+# Logging configuration for debugging stub matching
+logging:
+  level: INFO
+  components:
+    stub-matching: DEBUG
+    request-routing: DEBUG
+    file-loading: INFO

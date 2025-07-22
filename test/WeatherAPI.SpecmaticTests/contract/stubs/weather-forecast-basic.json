@@ -1,0 +1,162 @@
+{
+  "http-request": {
+    "method": "GET",
+    "path": "/api/WeatherForecast",
+    "headers": {},
+    "queryParameters": {
+      "basic": "true"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": [
+      {
+        "hour": 1,
+        "temperatureC": 20,
+        "temperatureF": 68,
+        "rainfallMm": 1.4
+      },
+      {
+        "hour": 2,
+        "temperatureC": -13,
+        "temperatureF": 9,
+        "rainfallMm": 5.2
+      },
+      {
+        "hour": 3,
+        "temperatureC": -10,
+        "temperatureF": 14,
+        "rainfallMm": 2.6
+      },
+      {
+        "hour": 4,
+        "temperatureC": 23,
+        "temperatureF": 73,
+        "rainfallMm": 5.1
+      },
+      {
+        "hour": 5,
+        "temperatureC": -10,
+        "temperatureF": 14,
+        "rainfallMm": 7.6
+      },
+      {
+        "hour": 6,
+        "temperatureC": -6,
+        "temperatureF": 22,
+        "rainfallMm": 2.6
+      },
+      {
+        "hour": 7,
+        "temperatureC": 10,
+        "temperatureF": 50,
+        "rainfallMm": 3.2
+      },
+      {
+        "hour": 8,
+        "temperatureC": 2,
+        "temperatureF": 35,
+        "rainfallMm": 2.6
+      },
+      {
+        "hour": 9,
+        "temperatureC": 11,
+        "temperatureF": 51,
+        "rainfallMm": 0.4
+      },
+      {
+        "hour": 10,
+        "temperatureC": 28,
+        "temperatureF": 82,
+        "rainfallMm": 5.8
+      },
+      {
+        "hour": 11,
+        "temperatureC": 3,
+        "temperatureF": 37,
+        "rainfallMm": 1.5
+      },
+      {
+        "hour": 12,
+        "temperatureC": -15,
+        "temperatureF": 5,
+        "rainfallMm": 7.1
+      },
+      {
+        "hour": 13,
+        "temperatureC": 28,
+        "temperatureF": 82,
+        "rainfallMm": 5.4
+      },
+      {
+        "hour": 14,
+        "temperatureC": -18,
+        "temperatureF": 0,
+        "rainfallMm": 7.1
+      },
+      {
+        "hour": 15,
+        "temperatureC": -12,
+        "temperatureF": 11,
+        "rainfallMm": 9.1
+      },
+      {
+        "hour": 16,
+        "temperatureC": 21,
+        "temperatureF": 69,
+        "rainfallMm": 5.2
+      },
+      {
+        "hour": 17,
+        "temperatureC": -9,
+        "temperatureF": 16,
+        "rainfallMm": 0.4
+      },
+      {
+        "hour": 18,
+        "temperatureC": -2,
+        "temperatureF": 29,
+        "rainfallMm": 5.8
+      },
+      {
+        "hour": 19,
+        "temperatureC": 29,
+        "temperatureF": 84,
+        "rainfallMm": 0
+      },
+      {
+        "hour": 20,
+        "temperatureC": 12,
+        "temperatureF": 53,
+        "rainfallMm": 8.1
+      },
+      {
+        "hour": 21,
+        "temperatureC": 24,
+        "temperatureF": 75,
+        "rainfallMm": 3.8
+      },
+      {
+        "hour": 22,
+        "temperatureC": -12,
+        "temperatureF": 11,
+        "rainfallMm": 0.3
+      },
+      {
+        "hour": 23,
+        "temperatureC": -17,
+        "temperatureF": 2,
+        "rainfallMm": 7.8
+      },
+      {
+        "hour": 24,
+        "temperatureC": 17,
+        "temperatureF": 62,
+        "rainfallMm": 1.2
+      }
+    ]
+  }
+}

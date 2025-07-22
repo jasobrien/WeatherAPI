@@ -1,0 +1,18 @@
+{
+  "http-request": {
+    "method": "GET",
+    "path": "/api/InvalidEndpoint",
+    "headers": {},
+    "queryParameters": {}
+  },
+  "http-response": {
+    "status": 404,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "error": "Not Found",
+      "message": "The requested resource was not found."
+    }
+  }
+}
