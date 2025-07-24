@@ -5,7 +5,7 @@ on:
     branches: [main, develop]
 
 env:
-  DOTNET_VERSION: "8.0.x"
+  DOTNET_VERSION: "9.0.x"
 
 jobs:
   quick-validation:
@@ -32,7 +32,8 @@ jobs:
           dotnet test test/WeatherAPI.UnitTests/WeatherAPI.UnitTests.csproj \
             --configuration Debug \
             --no-build \
-            --logger "console;verbosity=normal"
+            --logger "console;verbosity=normal" \
+            --settings coverletArgs.runsettings
 
       - name: 🔍 Validate contract syntax
         run: |
