@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 env:
-  DOTNET_VERSION: "9.0.x"
+  DOTNET_VERSION: "8.0.x"
   JAVA_VERSION: "17"
 
 jobs:
@@ -38,8 +38,7 @@ jobs:
             --logger "trx;LogFileName=unit-test-results.trx" \
             --logger "console;verbosity=detailed" \
             --results-directory TestResults/UnitTests/ \
-            --collect:"XPlat Code Coverage" \
-            --settings coverletArgs.runsettings
+            --collect:"XPlat Code Coverage"
 
       - name: 📊 Upload unit test results
         uses: actions/upload-artifact@v4
@@ -102,12 +101,12 @@ jobs:
           # Pull Specmatic Docker image
           docker pull znsio/specmatic:latest
 
-          # Validate contract syntax and examples
+          # Validate contract syntax
           docker run --rm \
             -v "$(pwd):/usr/src/app" \
             -w /usr/src/app \
             znsio/specmatic:latest \
-            examples validate --spec-file weather-api-contract.yaml
+            validate weather-api-contract.yaml
 
       - name: 🧪 Run Specmatic stub tests
         run: |
@@ -207,7 +206,6 @@ jobs:
             --logger "console;verbosity=detailed" \
             --results-directory TestResults/ \
             --collect:"XPlat Code Coverage" \
-            --settings coverletArgs.runsettings \
             --blame-hang-timeout 5m
 
       - name: 📊 Install ReportGenerator for enhanced reports

@@ -67,12 +67,19 @@ jobs:
           # Pull latest Specmatic
           docker pull znsio/specmatic:latest
 
-          # Validate contract examples
+          # Validate contract
           docker run --rm \
             -v "$(pwd):/usr/src/app" \
             -w /usr/src/app \
             znsio/specmatic:latest \
-            examples validate --spec-file weather-api-contract.yaml
+            validate weather-api-contract.yaml --verbose
+            
+          # Test contract examples
+          docker run --rm \
+            -v "$(pwd):/usr/src/app" \
+            -w /usr/src/app \
+            znsio/specmatic:latest \
+            examples weather-api-contract.yaml
 
       - name: 🎭 Comprehensive stub testing
         run: |
@@ -132,7 +139,6 @@ jobs:
             --logger "console;verbosity=diagnostic" \
             --results-directory TestResults/ \
             --collect:"XPlat Code Coverage" \
-            --settings coverletArgs.runsettings \
             --blame-hang-timeout 10m \
             --blame-crash \
             -- TestRunParameters.Parameter\(name=\"TestType\",value=\"Comprehensive\"\)
