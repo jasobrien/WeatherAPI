@@ -1,6 +1,6 @@
 # Weather API
 
-A modern .NET 9.0 Web API that provides 24-hour weather forecasts with temperature and rainfall data, following camelCase coding standards and clean architecture principles.
+A modern .NET 9.0 Web API that provides 24-hour weather forecasts with temperature and rainfall data.
 
 ## 🚀 Features
 
